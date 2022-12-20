@@ -4,7 +4,9 @@ import App from './App'
 // #ifndef VUE3
 import Vue from 'vue'
 import BootstrapVue from "@/common/js/bootstrap-vue.min.js"
+import BootstrapVueIcons from "@/common/js/bootstrap-vue-icons.min.js"
 Vue.use(BootstrapVue, {})
+Vue.use(BootstrapVueIcons)
 Vue.config.productionTip = false
 App.mpType = 'app'
 const app = new Vue({
