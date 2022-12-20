@@ -6,6 +6,7 @@
 		</view>
 	</view> -->
 	<div>
+		<Navbar/>
 		<b-alert show>Default Alert</b-alert>
 		
 		    <b-alert variant="success" show>Success Alert</b-alert>
@@ -40,7 +41,11 @@
 </template>
 
 <script>
+	import Navbar from '../../components/Navbar.vue';
 	export default {
+		components: {
+			Navbar
+		},
 		data() {
 			return {
 				title: 'Hello',
