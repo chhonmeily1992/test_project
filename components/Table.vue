@@ -49,7 +49,7 @@
       </template>
 
       <template #cell(actions)="row">
-        <b-button variant="primary" size="sm" @click="edit(row.item, row.item.title, $event.target)" class="mr-1 text-center">
+        <b-button variant="primary" size="sm" @click="editProduct(row.item, row.item.title, $event.target)" class="mr-1 text-center">
           <b-icon icon="pencil-fill"></b-icon>
         </b-button>
         <b-button variant="danger" size="sm" @click="deleteProduct(row.item, row.item.title, $event.target)" class="text-center">
@@ -78,8 +78,42 @@
 		</b-col>
 	</b-row>
     <!-- Edit modal -->
-    <b-modal :id="editModal.id" :title="'Edit ' + editModal.title" @hide="resetEditModal">
-      <pre>{{ editModal.content }}</pre>
+    <b-modal size="lg" :id="editModal.id" :title="'Edit ' + editModal.title" @hidden="resetEditModal">
+		<b-row>
+			<div class="ml-3 mb-3">
+				<label for="title">Title</label>
+				<b-form-input id="title" type="text" v-model="editModal.content.title" placeholder="Enter product title"></b-form-input>
+			</div>
+			<div class="ml-3 mb-3">
+				<label for="price">Price</label>
+				<b-form-input id="price" type="number" v-model="editModal.content.price" placeholder="Enter product price"></b-form-input>
+			</div>
+			<div class="ml-3 mb-3">
+				<label for="description">Description</label>
+				<b-form-input id="description" type="text" v-model="editModal.content.description" placeholder="Enter product description"></b-form-input>
+			</div>
+			<div class="ml-3 mb-3">
+				<label for="category">Category</label>
+				<b-form-input id="category" type="text" v-model="editModal.content.category" placeholder="Enter product category"></b-form-input>
+			</div>
+			
+			<!-- Styled -->
+			<div class="ml-3 mb-3">
+				<label for="product-image">Product Image</label>
+				<b-form-file
+				id="product-image"
+				  v-model="productImg"
+				  :state="Boolean(productImg)"
+				  placeholder="Choose a file or drop it here..."
+				  drop-placeholder="Drop file here..."
+				  accept="image/jpeg, image/png, image/gif"
+				></b-form-file>
+				 <b-button v-if="hasImage" class="mt-3" @click="clearImage">Clear image</b-button>
+			</div>
+			
+			<b-img img-height="100" v-if="hasImage" :src="productImgSrc" class="mb-3" fluid></b-img>
+			<b-img img-height="100" v-if="!hasImage" :src="getProductImage(editModal.content.image)" class="mb-3" fluid></b-img>
+		</b-row>
     </b-modal>
 	<!-- Delete modal -->
 	<b-modal 
@@ -91,7 +125,7 @@
 		  :footer-text-variant="footerTextVariant"
 		:id="deleteModal.id" 
 		:title="'Delete ' + deleteModal.title" 
-		variant="danger" @hide="resetDeleteModal">
+		variant="danger" @hidden="resetDeleteModal">
 	  <p>{{ 'Are you sure you want to delete ' + deleteModal.title }} ?</p>
 	</b-modal>
 	
@@ -99,10 +133,20 @@
 </template>
 
 <script>
+	
+	const base64Encode = data =>
+	  new Promise((resolve, reject) => {
+	    const reader = new FileReader();
+	    reader.readAsDataURL(data);
+	    reader.onload = () => resolve(reader.result);
+	    reader.onerror = error => reject(error);
+	  });
   export default {
     data() {
       return {
-        items: [],
+		productImg: null,
+        productImgSrc: null,
+		items: [],
         fields: [
           { key: 'id', label: 'Product ID', sortable: true, sortDirection: 'desc' },
           { key: 'title', label: 'Title', sortable: true, sortDirection: 'desc' },
@@ -112,7 +156,7 @@
         ],
         totalRows: 1,
         currentPage: 1,
-        perPage: 8,
+        perPage: 10,
         pageOptions: [5, 10, 15, { value: 100, text: "Show a lot" }],
         sortBy: '',
         sortDesc: false,
@@ -132,17 +176,43 @@
 		headerBgVariant: 'danger',
 		headerTextVariant: 'light',
 		bodyBgVariant: 'light',
-		bodyTextVariant: '',
+		bodyTextVariant: 'light',
 		footerBgVariant: 'danger',
 		footerTextVariant: 'light'
       }
     },
     computed: {
-    },
+		hasImage() {
+			return !!this.productImg;
+		}
+	},
+	watch: {
+		productImg(newValue, oldValue) {
+		      if (newValue !== oldValue) {
+		        if (newValue) {
+		          base64Encode(newValue)
+		            .then(value => {
+		              this.productImgSrc = value;
+		            })
+		            .catch(() => {
+		              this.productImgSrc = null;
+		            });
+		        } else {
+		          this.productImgSrc = null;
+		        }
+		      }
+		    }
+	},
     mounted() {
 		this.getAllProducts()
     },
     methods: {
+		 clearImage() {
+		      this.productImg = null;
+		    },
+		getProductImage(imageUrl) {
+			return imageUrl;
+		},
 		getAllProducts() {
 			const result = [];
 			uni.request({
@@ -162,9 +232,9 @@
 			    }
 			});
 		},
-      edit(item, title, button) {
+      editProduct(item, title, button) {
         this.editModal.title = `Product: ${title}`
-        this.editModal.content = JSON.stringify(item, null, 2)
+        this.editModal.content = item
         this.$root.$emit('bv::show::modal', this.editModal.id, button)
       },
 	  deleteProduct(item, title, button) {
@@ -175,10 +245,14 @@
       resetEditModal() {
         this.editModal.title = ''
         this.editModal.content = ''
+		this.productImgSrc = null
+		this.productImg = null
       },
 	  resetDeleteModal() {
 	    this.deleteModal.title = ''
 	    this.deleteModal.content = ''
+		this.productImgSrc = null
+		this.productImg = null
 	  },
       onFiltered(filteredItems) {
         // Trigger pagination to update the number of buttons/pages due to filtering
