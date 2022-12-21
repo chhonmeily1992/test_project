@@ -141,7 +141,6 @@
     },
     mounted() {
 		this.getAllProducts()
-	  
     },
     methods: {
 		getAllProducts() {
