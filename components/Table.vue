@@ -90,16 +90,14 @@
 			</div>
 			<div class="ml-3 mb-3">
 				<label for="description">Description</label>
-				<b-form-input id="description" type="text" v-model="editModal.content.description" placeholder="Enter product description"></b-form-input>
+				<b-form-textarea id="description" rows="3" max-row="6" no-auto-shrink v-model="editModal.content.description" placeholder="Enter product description"></b-form-textarea>
 			</div>
 			<div class="ml-3 mb-3">
 				<label for="category">Category</label>
 				<b-form-input id="category" type="text" v-model="editModal.content.category" placeholder="Enter product category"></b-form-input>
 			</div>
-			
-			<!-- Styled -->
 			<div class="ml-3 mb-3">
-				<label for="product-image">Product Image</label>
+				<label for="product-image">Change Product Image</label>
 				<b-form-file
 				id="product-image"
 				  v-model="productImg"
@@ -110,9 +108,10 @@
 				></b-form-file>
 				 <b-button v-if="hasImage" class="mt-3" @click="clearImage">Clear image</b-button>
 			</div>
-			
-			<b-img img-height="100" v-if="hasImage" :src="productImgSrc" class="mb-3" fluid></b-img>
-			<b-img img-height="100" v-if="!hasImage" :src="getProductImage(editModal.content.image)" class="mb-3" fluid></b-img>
+			<div class="ml-3 mb-3">
+				<b-img height="300" center v-if="hasImage" :src="productImgSrc" class="mb-3"></b-img>
+				<b-img height="300" center v-if="!hasImage" :src="getProductImage(editModal.content.image)" class="mb-3"></b-img>
+			</div>
 		</b-row>
     </b-modal>
 	<!-- Delete modal -->
@@ -233,7 +232,7 @@
 			});
 		},
       editProduct(item, title, button) {
-        this.editModal.title = `Product: ${title}`
+        this.editModal.title = `Product ${title}`
         this.editModal.content = item
         this.$root.$emit('bv::show::modal', this.editModal.id, button)
       },
