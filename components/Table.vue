@@ -49,10 +49,10 @@
       </template>
 
       <template #cell(actions)="row">
-        <b-button variant="primary" size="sm" @click="edit(row.item, row.index, $event.target)" class="mr-1 text-center">
+        <b-button variant="primary" size="sm" @click="edit(row.item, row.item.title, $event.target)" class="mr-1 text-center">
           <b-icon icon="pencil-fill"></b-icon>
         </b-button>
-        <b-button variant="danger" size="sm" @click="deleteProduct(row.item, row.index, $event.target)" class="text-center">
+        <b-button variant="danger" size="sm" @click="deleteProduct(row.item, row.item.title, $event.target)" class="text-center">
           <b-icon icon="trash-fill"></b-icon>
         </b-button>
       </template>
@@ -78,8 +78,8 @@
 		</b-col>
 	</b-row>
     <!-- Edit modal -->
-    <b-modal :id="editModal.id" :title="'Edit' + editModal.title" @hide="resetEditModal">
-      <pre>{{ editModal.content.title }}</pre>
+    <b-modal :id="editModal.id" :title="'Edit ' + editModal.title" @hide="resetEditModal">
+      <pre>{{ editModal.content }}</pre>
     </b-modal>
 	<!-- Delete modal -->
 	<b-modal 
@@ -90,9 +90,9 @@
 		  :footer-bg-variant="footerBgVariant"
 		  :footer-text-variant="footerTextVariant"
 		:id="deleteModal.id" 
-		:title="'Delete' + deleteModal.title" 
+		:title="'Delete ' + deleteModal.title" 
 		variant="danger" @hide="resetDeleteModal">
-	  <pre>{{ 'Are you sure you want to delete this product ' + deleteModal.content.title }}</pre>
+	  <p>{{ 'Are you sure you want to delete ' + deleteModal.title }} ?</p>
 	</b-modal>
 	
   </b-container>
@@ -102,10 +102,7 @@
   export default {
     data() {
       return {
-        items: [
-			{ id: 1, title: 'Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops', price:109.95, description: 'Your perfect pack for everyday use and walks in the forest. Stash your laptop (up to 15 inches) in the padded sleeve, your everyday', category: "men's clothing" },
-			{ id: 2, title: "Mens Casual Premium Slim Fit T-Shirts ", price: 22.3, description: "Slim-fitting style, contrast raglan long sleeve, three-button henley placket, light weight & soft fabric for breathable and comfortable wearing. And Solid stitched shirts with round neck made for durability and a great fit for casual fashion wear and diehard baseball fans. The Henley style round neckline includes a three-button placket.",category: "men's clothing",}
-        ],
+        items: [],
         fields: [
           { key: 'id', label: 'Product ID', sortable: true, sortDirection: 'desc' },
           { key: 'title', label: 'Title', sortable: true, sortDirection: 'desc' },
@@ -115,7 +112,7 @@
         ],
         totalRows: 1,
         currentPage: 1,
-        perPage: 5,
+        perPage: 8,
         pageOptions: [5, 10, 15, { value: 100, text: "Show a lot" }],
         sortBy: '',
         sortDesc: false,
@@ -143,17 +140,36 @@
     computed: {
     },
     mounted() {
-      // Set the initial number of items
-      this.totalRows = this.items.length
+		this.getAllProducts()
+	  
     },
     methods: {
-      edit(item, index, button) {
-        this.editModal.title = `Row index: ${index}`
+		getAllProducts() {
+			const result = [];
+			uni.request({
+			    url: 'https://fakestoreapi.com/products', //仅为示例，并非真实接口地址
+				method:'GET',
+			    data: {
+			        text: 'uni.request'
+			    },
+			    header: {
+			        'custom-header': 'hello' //自定义请求头信息
+			    },
+			    success: (res) => {
+					result.push(res.data);
+					this.$data.items = result[0];
+					this.$data.totalRows = this.$data.items.length;
+			        this.text = 'request success';
+			    }
+			});
+		},
+      edit(item, title, button) {
+        this.editModal.title = `Product: ${title}`
         this.editModal.content = JSON.stringify(item, null, 2)
         this.$root.$emit('bv::show::modal', this.editModal.id, button)
       },
-	  deleteProduct(item, index, button) {
-	    this.deleteModal.title = `Row index: ${index}`
+	  deleteProduct(item, title, button) {
+	    this.deleteModal.title = `Product: ${title}`
 	    this.deleteModal.content = JSON.stringify(item, null, 2)
 	    this.$root.$emit('bv::show::modal', this.deleteModal.id, button)
 	  },
