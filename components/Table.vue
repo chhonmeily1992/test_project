@@ -254,7 +254,7 @@
 			    data: JSON.stringify({
 					title: updatedData.title,
 					price: updatedData.price,
-					description: updatedData.price,
+					description: updatedData.description,
 					image: updatedData.image,
 					category: updatedData.category
 				}),
