@@ -126,10 +126,14 @@
 		  :body-text-variant="bodyTextVariant"
 		  :footer-bg-variant="footerBgVariant"
 		  :footer-text-variant="footerTextVariant"
+		ref="delete-modal"
+		hide-footer
 		:id="deleteModal.id" 
 		:title="'Delete ' + deleteModal.title" 
 		variant="danger" @hidden="resetDeleteModal">
 	  <p>{{ 'Are you sure you want to delete ' + deleteModal.title }} ?</p>
+	  <b-button class="mt-3" variant="outline-danger" block @click="resetDeleteModal">Close Me</b-button>
+	  <b-button class="mt-2" variant="outline-primary" block @click="handleDelete">Delete</b-button>
 	</b-modal>
 	
   </b-container>
@@ -264,6 +268,31 @@
 				this.resetEditModal()
 			);
 		},
+		handleDelete(bvModalEvent){
+			bvModalEvent.preventDefault()
+			this.deleteOneProduct(this.$data.deleteModal.content)
+		},
+		deleteOneProduct(deletedData) {
+	
+			const deleteProduct = uni.request({
+				header: {
+				    'custom-header': 'deleteOneProduct', //自定义请求头信息
+					'content-type': 'application/json'
+				},
+				url: 'https://fakestoreapi.com/products/'+deletedData.id, //仅为示例，并非真实接口地址
+				method:'DELETE',
+			}).then(
+				res => (res),
+				this.resetDeleteModal()
+			)
+			const productList = this.$data.items;
+			for ( var i=0; i < this.$data.items.length; i++ ){
+				if(productList[i].id === deletedData.id){
+					productList.splice(i, 1);
+					this.$data.items = productList;
+				}
+			}
+		},
       editProduct(item, title) {
         this.editModal.title = `Product ${title}`
         this.editModal.content = item
@@ -278,7 +307,7 @@
       },
 	  deleteProduct(item, title, button) {
 	    this.deleteModal.title = `Product: ${title}`
-	    this.deleteModal.content = JSON.stringify(item, null, 2)
+	    this.deleteModal.content = item
 	  		this.$bvModal.show(this.deleteModal.id)
 	  },
 	  resetDeleteModal() {
@@ -286,6 +315,7 @@
 	    this.deleteModal.content = ''
 		this.productImgSrc = null
 		this.productImg = null
+		this.$refs['delete-modal'].hide()
 	  },
       onFiltered(filteredItems) {
         // Trigger pagination to update the number of buttons/pages due to filtering
