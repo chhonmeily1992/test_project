@@ -49,7 +49,7 @@
       </template>
 
       <template #cell(actions)="row">
-        <b-button variant="primary" size="sm" @click="editProduct(row.item, row.item.title, $event.target)" class="mr-1 text-center">
+        <b-button variant="primary" size="sm" @click="editProduct(row.item, row.item.title)" class="mr-1 text-center">
           <b-icon icon="pencil-fill"></b-icon>
         </b-button>
         <b-button variant="danger" size="sm" @click="deleteProduct(row.item, row.item.title, $event.target)" class="text-center">
@@ -78,7 +78,7 @@
 		</b-col>
 	</b-row>
     <!-- Edit modal -->
-    <b-modal size="lg" :id="editModal.id" :title="'Edit ' + editModal.title" @hidden="resetEditModal">
+    <b-modal size="lg" ref="edit-modal" hide-footer :id="editModal.id" :title="'Edit ' + editModal.title" @hidden="">
 		<b-row>
 			<div class="ml-3 mb-3">
 				<label for="title">Title</label>
@@ -112,6 +112,10 @@
 				<b-img height="300" center v-if="hasImage" :src="productImgSrc" class="mb-3"></b-img>
 				<b-img height="300" center v-if="!hasImage" :src="getProductImage(editModal.content.image)" class="mb-3"></b-img>
 			</div>
+		</b-row>
+		<b-row>
+			 <b-button class="mt-3" variant="outline-danger" block @click="resetEditModal">Close Me</b-button>
+			<b-button class="mt-2" variant="outline-primary" block @click="handleSave">Save</b-button>
 		</b-row>
     </b-modal>
 	<!-- Delete modal -->
@@ -221,7 +225,7 @@
 			        text: 'uni.request'
 			    },
 			    header: {
-			        'custom-header': 'hello' //自定义请求头信息
+			        'custom-header': 'getallproducts' //自定义请求头信息
 			    },
 			    success: (res) => {
 					result.push(res.data);
@@ -231,22 +235,52 @@
 			    }
 			});
 		},
-      editProduct(item, title, button) {
+		handleSave(bvModalEvent) {
+			bvModalEvent.preventDefault()
+			this.updateOneProduct(this.$data.editModal.content)
+		},
+		updateOneProduct(updatedData) {
+			const file = this.productImg; 
+			if(file) {
+				updatedData.image = URL.createObjectURL(file);
+			}
+			const updateProduct = uni.request({
+			    header: {
+			        'custom-header': 'updateOneProduct', //自定义请求头信息
+			    	'content-type': 'application/json'
+			    },
+				url: 'https://fakestoreapi.com/products/7', //仅为示例，并非真实接口地址
+				method:'PUT',
+			    data: JSON.stringify({
+					title: updatedData.title,
+					price: updatedData.price,
+					description: updatedData.price,
+					image: updatedData.image,
+					category: updatedData.category
+				}),
+			})
+			.then(
+				res => console.log(res),
+				this.$refs['edit-modal'].hide()
+			);
+		},
+      editProduct(item, title) {
         this.editModal.title = `Product ${title}`
         this.editModal.content = item
-        this.$root.$emit('bv::show::modal', this.editModal.id, button)
+		this.$bvModal.show(this.editModal.id)
       },
-	  deleteProduct(item, title, button) {
-	    this.deleteModal.title = `Product: ${title}`
-	    this.deleteModal.content = JSON.stringify(item, null, 2)
-	    this.$root.$emit('bv::show::modal', this.deleteModal.id, button)
-	  },
       resetEditModal() {
         this.editModal.title = ''
         this.editModal.content = ''
 		this.productImgSrc = null
 		this.productImg = null
+		this.$refs['edit-modal'].hide()
       },
+	  deleteProduct(item, title, button) {
+	    this.deleteModal.title = `Product: ${title}`
+	    this.deleteModal.content = JSON.stringify(item, null, 2)
+	  		this.$bvModal.show(this.deleteModal.id)
+	  },
 	  resetDeleteModal() {
 	    this.deleteModal.title = ''
 	    this.deleteModal.content = ''
