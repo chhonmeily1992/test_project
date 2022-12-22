@@ -261,7 +261,7 @@
 			})
 			.then(
 				res => console.log(res),
-				this.$refs['edit-modal'].hide()
+				this.resetEditModal()
 			);
 		},
       editProduct(item, title) {
