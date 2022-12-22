@@ -260,7 +260,7 @@
 				}),
 			})
 			.then(
-				res => console.log(res),
+				res => (res),
 				this.resetEditModal()
 			);
 		},
