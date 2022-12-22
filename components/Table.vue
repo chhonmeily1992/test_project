@@ -249,7 +249,7 @@
 			        'custom-header': 'updateOneProduct', //自定义请求头信息
 			    	'content-type': 'application/json'
 			    },
-				url: 'https://fakestoreapi.com/products/7', //仅为示例，并非真实接口地址
+				url: 'https://fakestoreapi.com/products/'+updatedData.id, //仅为示例，并非真实接口地址
 				method:'PUT',
 			    data: JSON.stringify({
 					title: updatedData.title,
