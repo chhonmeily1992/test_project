@@ -273,7 +273,6 @@
 			this.deleteOneProduct(this.$data.deleteModal.content)
 		},
 		deleteOneProduct(deletedData) {
-	
 			const deleteProduct = uni.request({
 				header: {
 				    'custom-header': 'deleteOneProduct', //自定义请求头信息
