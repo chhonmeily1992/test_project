@@ -12,7 +12,12 @@
 				  <!-- Right aligned nav items -->
 				  <b-navbar-nav>
 					<b-nav-item href="#" active><b-icon class="p-1" icon="cart4" font-scale="2"></b-icon> Products</b-nav-item>
-					<b-nav-item href="#"><b-icon class="p-1" icon="cart-plus" font-scale="2"></b-icon> Add New Product</b-nav-item>
+					<navigator url="/pages/newProduct/newProduct" hover-class="newProduct-hover">
+						<b-nav-item>
+							<b-icon class="p-1" icon="cart-plus" font-scale="2"></b-icon>
+							Add New Product
+						</b-nav-item>
+					</navigator>
 					<b-nav-item href="#"><b-icon class="p-1" icon="file" font-scale="2"></b-icon>About</b-nav-item>
 				  </b-navbar-nav>
 				</b-collapse>

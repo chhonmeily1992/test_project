@@ -6,7 +6,14 @@
 				"navigationBarTitleText": "uni-app"
 			}
 		}
-	],
+	    ,{
+            "path" : "pages/newProduct/newProduct",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "Add New Product"
+            }
+        }
+    ],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
 		"navigationBarTitleText": "uni-app",
